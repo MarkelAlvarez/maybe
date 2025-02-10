@@ -1,4 +1,11 @@
 Rails.application.routes.draw do
+  # MFA routes
+  resource :mfa, controller: "mfa", only: [ :new, :create ] do
+    get :verify
+    post :verify, to: "mfa#verify_code"
+    delete :disable
+  end
+
   mount GoodJob::Engine => "good_job"
 
   get "changelog", to: "pages#changelog"
@@ -25,6 +32,7 @@ Rails.application.routes.draw do
     resource :preferences, only: :show
     resource :hosting, only: %i[show update]
     resource :billing, only: :show
+    resource :security, only: :show
   end
 
   resource :subscription, only: %i[new show] do
@@ -57,6 +65,7 @@ Rails.application.routes.draw do
 
   resources :imports, only: %i[index new show create destroy] do
     post :publish, on: :member
+    put :revert, on: :member
 
     resource :upload, only: %i[show update], module: :import
     resource :configuration, only: %i[show update], module: :import
@@ -174,6 +183,7 @@ Rails.application.routes.draw do
 
   namespace :webhooks do
     post "plaid"
+    post "plaid_eu"
     post "stripe"
   end
 
